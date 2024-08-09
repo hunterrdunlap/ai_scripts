@@ -8,15 +8,25 @@ client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 def generate_search_query(row: Dict[str, str], prompt: str, query_prompt: str) -> str:
     
-    print("searching web...")
-    response = client.completions.create(
+    print("searching web...")    
+    message = client.messages.create(
         model="claude-3-haiku-20240307",
-        prompt=query_prompt,
-        max_tokens_to_sample=100,
-        temperature=0.1
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": query_prompt}
+        ]
     )
-
-    return response.completion.strip()
+    
+    try:
+        response = message.content[0].text
+    except:
+        ValueError("No response from Claude") 
+        
+    # Parse the JSON response
+    response_json = json.loads(response)
+    
+    # Extract the query
+    return response_json["query"]
 
 def generate_answer(row: Dict[str, str], page_contents: List[Dict[str, str]], prompt: str, input_file_information: str, response_format: str) -> Dict[str, str]:
     print("generating answer...")
@@ -33,11 +43,20 @@ def generate_answer(row: Dict[str, str], page_contents: List[Dict[str, str]], pr
     {response_format}
     """
 
-    response = client.completions.create(
+    message = client.messages.create(
         model="claude-3-haiku-20240307",
-        prompt=answer_prompt,
-        max_tokens_to_sample=1000,
-        temperature=0.1
+        max_tokens=1000,
+        temperature=0.1,
+        messages=[
+            {"role": "user", "content": answer_prompt}
+        ]
     )
 
-    return json.loads(response.completion)
+    try:
+        response = message.content[0].text
+        return json.loads(response)
+    except json.JSONDecodeError:
+        print("Warning: Response is not in JSON format. Returning raw text.")
+        return {"raw_response": response}
+    except IndexError:
+        raise ValueError("No response from Claude")
