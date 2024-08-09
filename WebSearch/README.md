@@ -12,7 +12,6 @@ This project uses the Brave search API and Claude AI to process questions from a
 2. Set up your API keys in `config.py`:
    - ANTHROPIC_API_KEY: Your Claude API key
    - BRAVE_API_KEY: Your Brave Search API key
-   - GOOGLE_API_KEY: Your Google API key
 
 3. Prepare your input CSV file with at least a 'question' column.
 

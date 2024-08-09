@@ -1,12 +1,8 @@
 import requests
 from time import sleep
+from typing import List, Dict, Any
 
-# def generate_search_query(row):
-#     # Implement logic to generate a search query based on the row data
-#     # For simplicity, let's assume the row has a 'question' column
-#     return row['question']
-
-def get_search_results(query, api_key, num_results=5):
+def get_search_results(query: str, api_key: str, num_results: int = 5) -> List[Dict[str, Any]]:
     headers = {"Accept": "application/json", "X-Subscription-Token": api_key}
     response = requests.get(
         "https://api.search.brave.com/res/v1/web/search",
@@ -20,7 +16,7 @@ def get_search_results(query, api_key, num_results=5):
     return response.json().get("web", {}).get("results", [])
 
 
-def get_page_content(url):
+def get_page_content(url: str) -> str:
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
