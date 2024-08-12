@@ -2,15 +2,15 @@ import anthropic
 import json
 from typing import Dict, List, Any
 
-from config import ANTHROPIC_API_KEY
+from config import ANTHROPIC_API_KEY, MODEL
 
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
 def generate_search_query(row: Dict[str, str], prompt: str, query_prompt: str) -> str:
     
-    print("searching web...")    
+    print("searching web for information on  ", row["CompanyName"])    
     message = client.messages.create(
-        model="claude-3-haiku-20240307",
+        model=MODEL,
         max_tokens=1024,
         messages=[
             {"role": "user", "content": query_prompt}
@@ -44,8 +44,8 @@ def generate_answer(row: Dict[str, str], page_contents: List[Dict[str, str]], pr
     """
 
     message = client.messages.create(
-        model="claude-3-haiku-20240307",
-        max_tokens=1000,
+        model=MODEL,
+        max_tokens=1024,
         temperature=0.1,
         messages=[
             {"role": "user", "content": answer_prompt}

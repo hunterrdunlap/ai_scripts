@@ -35,19 +35,37 @@ def main(input_file: str, output_file: str) -> None:
             (1) How many full time employees does the company have? 
             (2) Where is the company located? City, State, and Country Please.
             (3) When was the company founded? 
+            
+            Please search for these answers from their official website or reliable sources. Please create a search that would likely search their own content. 
             """
     
     response_format = """
         Please provide your answer in the following format:
         {
             "Company Name": "Your concise answer here",
-            "Full Time Employees": "A brief explanation of your answer",
+            "Full Time Employees": "The Number of Full Time Employees",
             "Location": "The Location Based on the information you found",
             "Founding Year": "The Founding Year of the company",
             "sources": ["list", "of", "sources", "used"]
         }
         
+        e.g.
+        {
+            "Company Name": "Company ABC",
+            "Full Time Employees": "150", 
+            "Location": "Berlin, Berlin, Germany",
+            "Founding Year": "1960",
+            "sources": ["www.companya.com", "www.wikipedia.com"]
+        }
+        
+        ANSWER TYPES:
+        - Full Time Employees: A number (e.g., 150)
+        NOTE: Do not provide ranges or modifying words. Only say a number. Adding any extra context will break the response.
+        - Location: City, State, and Country (e.g., Berlin, Berlin, Germany)
+        - Founding Year: A year (e.g., 1960)
+        
         IMPORTANT: DO NOT MAKE UP INFORMATION. ONLY PROVIDE ANSWERS BASED ON THE INFORMATION YOU FIND IN THE SEARCH RESULTS.
+        PLEASE DO NOT ELABORATE ON WHY YOU CHOSE ANY ANSWER. JUST PROVIDE THE RAW INFORMATION. 
         """
     
     for row in tqdm(rows, desc="Processing rows", unit="row"):
@@ -80,5 +98,5 @@ def main(input_file: str, output_file: str) -> None:
 
 if __name__ == "__main__":
     input_file = "input/test.csv"
-    output_file = "output/output.json"
+    output_file = "output/output3.json"
     main(input_file, output_file)
