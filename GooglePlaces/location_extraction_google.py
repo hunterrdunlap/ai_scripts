@@ -60,7 +60,7 @@ def process_address(row: Dict[str, str]) -> Dict[str, str]:
     Returns:
         Dict[str, str]: The input row enriched with Google's formatted address.
     """
-    query = f"{row['FullAddress']}"
+    query = f"{row['FullPostalAddress']}"
     place_id = get_place_id(query)
     if place_id:
         place_details = get_place_details(place_id)
@@ -117,4 +117,6 @@ def enrich_address_data(input_file: str, output_file: str) -> None:
 
 
 if __name__ == "__main__":
-    enrich_address_data("GooglePlaces/services_location_data.csv", "GooglePlaces/services_location_data_with_google_format.csv")
+    enrich_address_data(
+        "GooglePlaces/data/location_information_10_16_2024.csv", "GooglePlaces/data/location_information_10_16_2024_with_google_format.csv"
+    )

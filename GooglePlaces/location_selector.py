@@ -1,11 +1,11 @@
 """
-This module classifies locations based on given address information using OpenAI's GPT model.
+This module classifies locations based on postal address information using OpenAI's GPT model.
 It processes a CSV file containing location data and outputs a new CSV file with classifications.
 """
 
 import csv
 import json
-from typing import Dict, List
+from typing import Dict
 from openai import OpenAI
 from config import OPENAI_API_KEY, MODEL
 from tqdm import tqdm
@@ -16,9 +16,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 EXAMPLES = """
 Example 1:
 Input:
-City: New York
-Country: United States
-FullAddress: 123 Broadway, New York, NY 10001, United States
+FullPostalAddress: 123 Broadway, New York, NY 10001, United States
 
 Output:
 {
@@ -27,9 +25,7 @@ Output:
 
 Example 2:
 Input:
-City: Toronto
-Country: Canada
-FullAddress: 456 Yonge Street, Toronto, ON M4Y 1X9, Canada
+FullPostalAddress: 456 Yonge Street, Toronto, ON M4Y 1X9, Canada
 
 Output:
 {
@@ -38,9 +34,7 @@ Output:
 
 Example 3:
 Input:
-City: London
-Country: United Kingdom
-FullAddress: 10 Downing Street, London, SW1A 2AA, United Kingdom
+FullPostalAddress: 10 Downing Street, London, SW1A 2AA, United Kingdom
 
 Output:
 {
@@ -49,9 +43,7 @@ Output:
 
 Example 4:
 Input:
-City: Tokyo
-Country: Japan
-FullAddress: 1-1 Chiyoda, Tokyo 100-8111, Japan
+FullPostalAddress: 1-1 Chiyoda, Tokyo 100-8111, Japan
 
 Output:
 {
@@ -60,9 +52,7 @@ Output:
 
 Example 5:
 Input:
-City: N/A
-Country: N/A
-FullAddress: Remote
+FullPostalAddress: Remote
 
 Output:
 {
@@ -71,14 +61,12 @@ Output:
 """
 
 
-def classify_location(city: str, country: str, full_address: str) -> str:
+def classify_location(full_address: str) -> str:
     """
-    Classify a location based on its city, country, and full address.
+    Classify a location based on its full postal address.
 
     Args:
-        city (str): The city name.
-        country (str): The country name.
-        full_address (str): The full address of the location.
+        full_address (str): The full postal address of the location.
 
     Returns:
         str: The classification of the location.
@@ -97,12 +85,10 @@ def classify_location(city: str, country: str, full_address: str) -> str:
 
     {EXAMPLES}
 
-    Now, analyze the following information for a new location:
+    Now, analyze the following address:
 
     Input:
-    City: {city}
-    Country: {country}
-    FullAddress: {full_address}
+    FullPostalAddress: {full_address}
 
     Please respond with the classification in the following format:
     {{
@@ -155,11 +141,9 @@ def process_location(row: Dict[str, str]) -> Dict[str, str]:
     Returns:
         Dict[str, str]: A dictionary with LocationID and Classification.
     """
-    city = row.get("City", "N/A")
-    country = row.get("Country", "N/A")
-    full_address = row.get("GoogleFormattedAddress", "N/A")
-    classification = classify_location(city, country, full_address)
-    return {"LocationID": row.get("LocationID", "Unknown"), "Classification": classification}
+    full_address = row.get("FullPostalAddress", "N/A")
+    classification = classify_location(full_address)
+    return {"LocationID": row.get("\ufeffLocationID", "Unknown"), "Classification": classification}
 
 
 def process_csv(input_file_path: str, output_file_path: str, num_threads: int = 20):
@@ -191,6 +175,6 @@ def process_csv(input_file_path: str, output_file_path: str, num_threads: int = 
 
 
 if __name__ == "__main__":
-    input_csv_file_path = "GooglePlaces/services_location_data_with_google_format.csv"
-    output_csv_file_path = "GooglePlaces/services_location_data_classified.csv"
+    input_csv_file_path = "GooglePlaces/data/location_information_10_16_2024.csv"
+    output_csv_file_path = "GooglePlaces/data/location_information_10_16_2024_classified.csv"
     process_csv(input_file_path=input_csv_file_path, output_file_path=output_csv_file_path)

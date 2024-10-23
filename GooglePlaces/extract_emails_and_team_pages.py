@@ -76,8 +76,8 @@ def fetch_sitemap(base_url: str) -> List[str]:
         urls = [elem.text for elem in root.iter() if elem.tag.endswith("loc")]
         logger.info(f"Found {len(urls)} URLs in sitemap")
         return urls
-    except requests.RequestException as e:
-        logger.warning(f"Error fetching sitemap: {e}")
+    except (requests.RequestException, ET.ParseError, ValueError, TypeError) as e:
+        logger.warning(f"Error processing sitemap: {e}")
         return []
 
 
@@ -148,11 +148,15 @@ def extract_emails_from_website(base_url: str, team_pages: List[str], max_pages:
         return []
 
 
-def ai_select_team_pages(urls: List[str], max_candidates: int = 5) -> List[str]:
+def ai_select_team_pages(urls: List[str], max_candidates: int = 5, max_urls_in_prompt: int = 250) -> List[str]:
     """
     Use AI to select the best candidate URLs for team pages.
     """
     logger.info(f"Using AI to select team pages from {len(urls)} URLs")
+
+    # Limit the number of URLs in the prompt
+    urls_for_prompt = urls[:max_urls_in_prompt]
+
     prompt = f"""
     Please respond in this format:
     {{
@@ -160,7 +164,7 @@ def ai_select_team_pages(urls: List[str], max_candidates: int = 5) -> List[str]:
     }}
     
     Select the best {max_candidates} URLs for team pages from the list provided here:
-    {urls}
+    {urls_for_prompt}
     
     Examples of team pages:
     - alte-post.net/team/
@@ -231,7 +235,7 @@ def find_team_pages(base_url: str) -> List[str]:
     urls = fetch_sitemap(base_url)
     if not urls:
         logger.info("Sitemap not found or empty, falling back to crawling")
-        urls = crawl_website(base_url, depth=2)
+        urls = crawl_website(base_url, depth=1)
     team_pages = ai_select_team_pages(urls)
     logger.info(f"Found {len(team_pages)} potential team pages")
     return team_pages
@@ -355,7 +359,7 @@ def enrich_website_data(input_file: str, output_file: str, max_workers: int = 20
 
 if __name__ == "__main__":
     enrich_website_data(
-        "GooglePlaces/data/Websites_For_Scraping_Input.csv",
-        "GooglePlaces/website-scraping-output-09-03-2024.csv",
-        max_workers=30,
+        "GooglePlaces/data/Scraping_Part_3.csv",
+        "GooglePlaces/website-scraping-output-part-3-09-03-2024.csv",
+        max_workers=10,
     )
